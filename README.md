@@ -16,6 +16,7 @@
 - flutter_riverpod
 
 # Structure
+```
 lib/
   ├── main.dart
   ├── models/
@@ -24,3 +25,5 @@ lib/
     ├── home_page.dart
     ├── dish_detail_page.dart
   └── widgets/
+```
+

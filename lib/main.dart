@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'pages/login_page.dart';
 
 void main() {
   runApp(const MainApp());
@@ -9,11 +11,18 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
+    return MaterialApp(
+      title: 'Dishcovery',
+      theme: ThemeData(
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(0, 236, 4, 4),
         ),
+      ),
+      home: SafeArea(
+        child: Consumer(builder: (context, ref, child) {
+          return const LoginPage();
+        }),
       ),
     );
   }
