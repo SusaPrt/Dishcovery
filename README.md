@@ -11,19 +11,27 @@
 ## User Experience
 
 ## Dependencies
-- uuid, for generating unique identifiers for dishes
-- http, for handling HTTP requests
-- flutter_riverpod
+
 
 # Structure
 ```
 lib/
   ├── main.dart
   ├── models/
-    ├── dish.dart
+    ├── ingredients.dart
+    ├── ingredient.g.dart
+    ├── user.dart
+    ├── muser.g.dart
   ├── pages/
+    ├── cart_page.dart
+    ├── login_page.dart
+    ├── main_app_page.dart
+    ├── pantry_page.dart
+    ├── recipes_page.dart
+    ├── settings_page.dart
+    ├── sign_up_page.dart
+  ├── services/
     ├── home_page.dart
-    ├── dish_detail_page.dart
-  └── widgets/
+    ├── spoonacular_api.dart
 ```
 

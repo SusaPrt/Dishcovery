@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'pages/login_page.dart';
+import 'pages/main_app_page.dart';
+import 'models/user.dart';
+import 'models/ingredient.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(UserAdapter());
+  Hive.registerAdapter(IngredientAdapter());
   runApp(const MainApp());
 }
 
@@ -19,11 +26,11 @@ class MainApp extends StatelessWidget {
           seedColor: const Color.fromARGB(0, 236, 4, 4),
         ),
       ),
-      home: SafeArea(
-        child: Consumer(builder: (context, ref, child) {
-          return const LoginPage();
-        }),
-      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const LoginPage(),
+        '/main': (context) => MainAppPage(),
+      },
     );
   }
 }

@@ -1,55 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/user.dart';
-import 'sign_up_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignUpPage extends StatelessWidget {
+  SignUpPage({super.key});
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  String? _errorMessage;
-  late Box<User> userBox;
+  final _formKey = GlobalKey<FormState>();
 
-  @override
-  void initState() {
-    super.initState();
-    _openUserBox();
-  }
-
-  Future<void> _openUserBox() async {
-    userBox = await Hive.openBox<User>('users');
-  }
-
-  Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) return;
+  Future<void> _register(BuildContext context) async {
+    var userBox = await Hive.openBox<User>('users');
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    final user = userBox.values.where(
-      (u) => u.email == email && u.password == password,
-    ).cast<User?>().firstOrNull;
-    if (user != null) {
-      var sessionBox = await Hive.openBox('session');
-      sessionBox.put('currentUserEmail', user.email);
-      Navigator.pushReplacementNamed(context, '/main');
-    } else {
-      setState(() {
-        _errorMessage = 'Invalid email or password';
-      });
+    if (userBox.values.any((u) => u.email == email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email already registered')),
+      );
+      return;
     }
+    final newUser = User(email: email, password: password);
+    await userBox.add(newUser);
+    // Salva l'email dell'utente appena registrato in session
+    var sessionBox = await Hive.openBox('session');
+    sessionBox.put('currentUserEmail', newUser.email);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Registration successful'), duration: Duration(seconds: 2)),
+    );
+    await Future.delayed(const Duration(seconds: 1));
+    Navigator.pushReplacementNamed(context, '/main');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Sign Up'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -107,29 +93,24 @@ class _LoginPageState extends State<LoginPage> {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter your password';
                                 }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
                                 return null;
                               },
                             ),
                             const SizedBox(height: 24),
-                            if (_errorMessage != null)
-                              Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
                             ElevatedButton(
-                              onPressed: _login,
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  _register(context);
+                                }
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.black,
                                 foregroundColor: Colors.white,
                               ),
-                              child: const Text('Login'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => SignUpPage()),
-                                );
-                              },
-                              child: const Text("Don't have an account? Sign up"),
-                              style: TextButton.styleFrom(foregroundColor: Colors.black),
+                              child: const Text('Sign Up'),
                             ),
                           ],
                         ),
