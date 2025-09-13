@@ -128,8 +128,8 @@ class _LoginPageState extends State<LoginPage> {
                                   MaterialPageRoute(builder: (context) => SignUpPage()),
                                 );
                               },
-                              child: const Text("Don't have an account? Sign up"),
                               style: TextButton.styleFrom(foregroundColor: Colors.black),
+                              child: const Text("Don't have an account? Sign up"),
                             ),
                           ],
                         ),

@@ -55,7 +55,7 @@ class _RecipesPageState extends State<RecipesPage> {
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.asset('img/logo.png', height: 32, width: 32),
+          child: Image.asset('img/logo.png', height: 48, width: 48),
         ),
         title: const Text('Recipes', style: TextStyle(color: Colors.black)),
         automaticallyImplyLeading: false,
@@ -112,19 +112,19 @@ class _RecipesPageState extends State<RecipesPage> {
                                           icon: Icon(Icons.add_shopping_cart, color: Colors.black),
                                           tooltip: 'Add to cart',
                                           onPressed: () async {
-                                            // Parse quantity and unit from 'original' string if possible
                                             String name = ing['name'] ?? '';
                                             String original = ing['original'] ?? '';
                                             int quantity = 1;
                                             String unit = '';
-                                            // Try to extract quantity and unit from original string
                                             final match = RegExp(r'([0-9]+)\s*([a-zA-Z]*)').firstMatch(original);
                                             if (match != null) {
                                               quantity = int.tryParse(match.group(1) ?? '1') ?? 1;
                                               unit = match.group(2) ?? '';
                                             }
                                             var cartBox = await Hive.openBox<Ingredient>('cart');
-                                            await cartBox.add(Ingredient(name: name, quantity: quantity, unit: unit));
+                                            var sessionBox = await Hive.openBox('session');
+                                            final email = sessionBox.get('currentUserEmail');
+                                            await cartBox.add(Ingredient(name: name, quantity: quantity, unit: unit, ownerEmail: email));
                                             ScaffoldMessenger.of(context).showSnackBar(
                                               SnackBar(content: Text('Added $name to cart')),
                                             );

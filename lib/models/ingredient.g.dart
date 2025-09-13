@@ -19,7 +19,8 @@ class IngredientAdapter extends TypeAdapter<Ingredient> {
     return Ingredient(
       name: fields[0] as String,
       quantity: fields[1] as int,
-      unit: fields[2] as String,
+      unit: fields[2] as String, 
+      ownerEmail: '',
     );
   }
 

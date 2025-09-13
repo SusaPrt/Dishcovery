@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/user.dart';
+import '../models/ingredient.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
   State<SettingsPage> createState() => _SettingsPageState();
 }
@@ -14,15 +17,15 @@ class _SettingsPageState extends State<SettingsPage> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Cambia email'),
+        title: Text('Change email'),
         content: TextField(
           controller: emailController,
-          decoration: InputDecoration(labelText: 'Nuova email'),
+          decoration: InputDecoration(labelText: 'New email'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annulla'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -39,14 +42,29 @@ class _SettingsPageState extends State<SettingsPage> {
                   currentUser.email = newEmail;
                   await currentUser.save();
                   sessionBox.put('currentUserEmail', newEmail);
+                  var pantryBox = await Hive.openBox<Ingredient>('ingredients');
+                  var cartBox = await Hive.openBox<Ingredient>('cart');
+                  for (var ing in pantryBox.values.where((i) => i.ownerEmail == email)) {
+                    ing.ownerEmail = newEmail;
+                    await ing.save();
+                  }
+                  for (var ing in cartBox.values.where((i) => i.ownerEmail == email)) {
+                    ing.ownerEmail = newEmail;
+                    await ing.save();
+                  }
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Email aggiornata!')),
+                    SnackBar(content: Text('Email updated!')),
                   );
                 }
+              } else {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Enter a valid email')),
+                );
               }
             },
-            child: Text('Salva'),
+            child: Text('Save'),
           ),
         ],
       ),
@@ -58,10 +76,10 @@ class _SettingsPageState extends State<SettingsPage> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Cambia password'),
+        title: Text('Change password'),
         content: TextField(
           controller: passwordController,
-          decoration: InputDecoration(labelText: 'Nuova password'),
+          decoration: InputDecoration(labelText: 'New password'),
           obscureText: true,
         ),
         actions: [
@@ -85,12 +103,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   await currentUser.save();
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Password aggiornata!')),
+                    SnackBar(content: Text('Password updated!')),
                   );
                 }
+              } else {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Password must be at least 6 characters long')),
+                );
               }
             },
-            child: Text('Salva'),
+            child: Text('Save'),
           ),
         ],
       ),
@@ -102,20 +125,20 @@ class _SettingsPageState extends State<SettingsPage> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Elimina account'),
-        content: Text('Scrivi "ELIMINA" per confermare'),
+        title: Text('Delete account'),
+        content: Text('Type "DELETE" to confirm'),
         actions: [
           TextField(
             controller: confirmController,
-            decoration: InputDecoration(labelText: 'Conferma'),
+            decoration: InputDecoration(labelText: 'Confirm'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annulla'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
-              if (confirmController.text.trim().toUpperCase() == 'ELIMINA') {
+              if (confirmController.text.trim().toUpperCase() == 'DELETE') {
                 var sessionBox = await Hive.openBox('session');
                 var email = sessionBox.get('currentUserEmail');
                 var userBox = await Hive.openBox<User>('users');
@@ -123,17 +146,21 @@ class _SettingsPageState extends State<SettingsPage> {
                   (u) => u.email == email,
                   orElse: () => User(email: '', password: ''),
                 );
+                var pantryBox = await Hive.openBox<Ingredient>('ingredients');
+                var cartBox = await Hive.openBox<Ingredient>('cart');
+                pantryBox.values.where((i) => i.name == email).forEach((i) async => await i.delete());
+                cartBox.values.where((i) => i.name == email).forEach((i) async => await i.delete());
                 if (toDelete.email.isNotEmpty) {
                   await toDelete.delete();
                   await sessionBox.delete('currentUserEmail');
                   Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Account eliminato!')),
+                    SnackBar(content: Text('Account deleted!')),
                   );
                 }
               }
             },
-            child: Text('Elimina'),
+            child: Text('Delete'),
           ),
         ],
       ),

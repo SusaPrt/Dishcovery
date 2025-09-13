@@ -1,27 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/ingredient.dart';
+import 'package:hive/hive.dart';
+
 
 class PantryPage extends StatefulWidget {
   const PantryPage({super.key});
 
   @override
-  _PantryPageState createState() => _PantryPageState();
+  State<PantryPage> createState() => _PantryPageState();
 }
 
 class _PantryPageState extends State<PantryPage> {
   Box<Ingredient>? ingredientBox;
+  Box? userBox;
+  String currentUserEmail = '';
   bool isBoxReady = false;
 
   @override
   void initState() {
     super.initState();
-    _openIngredientBox();
+    _openBoxes();
   }
 
-  Future<void> _openIngredientBox() async {
+  Future<void> _openBoxes() async {
     ingredientBox = await Hive.openBox<Ingredient>('ingredients');
+    // userBox = await Hive.openBox('users'); // non serve più
+    var sessionBox = await Hive.openBox('session');
+    final email = sessionBox.get('currentUserEmail');
     setState(() {
+      currentUserEmail = email is String ? email : '';
       isBoxReady = true;
     });
   }
@@ -71,7 +79,8 @@ class _PantryPageState extends State<PantryPage> {
             onPressed: () {
               final name = nameController.text.trim();
               final quantity = int.tryParse(quantityController.text) ?? 0;
-              final exists = ingredientBox?.values.any((i) => i.name.toLowerCase() == name.toLowerCase()) ?? false;
+              final exists = ingredientBox?.values.any((i) =>
+                i.ownerEmail == currentUserEmail && i.name.toLowerCase() == name.toLowerCase()) ?? false;
               if (exists) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Ingredient already exists in pantry')),
@@ -79,8 +88,14 @@ class _PantryPageState extends State<PantryPage> {
                 return;
               }
               if (name.isNotEmpty && quantity > 0) {
-                ingredientBox?.add(Ingredient(name: name, quantity: quantity, unit: selectedUnit));
+                ingredientBox?.add(Ingredient(
+                  name: name,
+                  quantity: quantity,
+                  unit: selectedUnit,
+                  ownerEmail: currentUserEmail,
+                ));
                 Navigator.pop(context);
+                setState(() {});
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Please enter valid name and quantity')),
@@ -156,6 +171,7 @@ class _PantryPageState extends State<PantryPage> {
 
   void _removeIngredient(int index) {
     ingredientBox?.deleteAt(index);
+    setState(() {});
   }
 
   @override
@@ -164,7 +180,7 @@ class _PantryPageState extends State<PantryPage> {
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.asset('img/logo.png', height: 32, width: 32),
+          child: Image.asset('img/logo.png', height: 48, width: 48),
         ),
         title: Text('Pantry', style: TextStyle(color: Colors.black)),
         backgroundColor: Color(0xFFFFF8E1),
@@ -178,13 +194,19 @@ class _PantryPageState extends State<PantryPage> {
             : ValueListenableBuilder(
                 valueListenable: ingredientBox!.listenable(),
                 builder: (context, Box<Ingredient> box, _) {
-                  if (box.isEmpty) {
+                  // Filter ingredients for current user
+                  final userIngredients = box.values
+                      .where((i) => i.ownerEmail == currentUserEmail)
+                      .toList();
+                  if (userIngredients.isEmpty) {
                     return Center(child: Text('No ingredients added.', style: TextStyle(color: Colors.black)));
                   }
                   return ListView.builder(
-                    itemCount: box.length,
+                    itemCount: userIngredients.length,
                     itemBuilder: (context, index) {
-                      final ingredient = box.getAt(index);
+                      final ingredient = userIngredients[index];
+                      // Find the actual index in the box for edit/delete
+                      final boxIndex = box.values.toList().indexOf(ingredient);
                       return Center(
                         child: SizedBox(
                           width: 350,
@@ -195,11 +217,11 @@ class _PantryPageState extends State<PantryPage> {
                             elevation: 4,
                             child: ListTile(
                               title: Text(
-                                ingredient?.name ?? '',
+                                ingredient.name,
                                 style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                               ),
                               subtitle: Text(
-                                'Quantity: ${ingredient?.quantity ?? 0} ${ingredient?.unit ?? ''}',
+                                'Quantity: ${ingredient.quantity} ${ingredient.unit}',
                                 style: TextStyle(color: Colors.black),
                               ),
                               trailing: Row(
@@ -208,15 +230,13 @@ class _PantryPageState extends State<PantryPage> {
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.black),
                                     onPressed: () {
-                                      if (ingredient != null) {
-                                        _editIngredient(index, ingredient);
-                                      }
+                                      _editIngredient(boxIndex, ingredient);
                                     },
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
                                     onPressed: () {
-                                      _removeIngredient(index);
+                                      _removeIngredient(boxIndex);
                                     },
                                   ),
                                 ],

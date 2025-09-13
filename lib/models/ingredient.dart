@@ -13,5 +13,8 @@ class Ingredient extends HiveObject {
   @HiveField(2)
   String unit;
 
-  Ingredient({required this.name, required this.quantity, required this.unit});
+  @HiveField(3)
+  String ownerEmail;
+
+  Ingredient({required this.name, required this.quantity, required this.unit, required this.ownerEmail});
 }
