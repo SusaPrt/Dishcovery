@@ -21,9 +21,12 @@ Una volta autenticato, l'utente verrà indirizzato alla schermata principale del
 
 <p align="center">
   <img src="img/readme/pantry.png" alt="Schermata Dispensa" width="300"/>
-  <img src="img/readme/recipes.png" alt="Schermata Ricette" width="300"/>
   <img src="img/readme/cart.png" alt="Schermata Carrello" width="300"/>
   <img src="img/readme/settings.png" alt="Schermata Impostazioni" width="300"/>
+</p>
+
+<p align="center">
+  <img src="img/readme/recipes.png" alt="Schermata Ricette" width="400"/>
 </p>
 
 ## Gestione dello stato
