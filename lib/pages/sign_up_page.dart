@@ -21,7 +21,6 @@ class SignUpPage extends StatelessWidget {
     }
     final newUser = User(email: email, password: password);
     await userBox.add(newUser);
-    // Salva l'email dell'utente appena registrato in session
     var sessionBox = await Hive.openBox('session');
     sessionBox.put('currentUserEmail', newUser.email);
     ScaffoldMessenger.of(context).showSnackBar(
