@@ -17,13 +17,16 @@ L'utente accederà all'applicativo tramite l'inserimento di email e password. Se
   <img src="img/readme/sign_up.png" alt="Schermata Sign Up" width="300"/>
 </p>
 
-Una volta autenticato, l'utente verrà indirizzato alla schermata principale dell'app, che include una barra di navigazione inferiore per accedere alle diverse sezioni: Dispensa, Ricette, Carrello e Impostazioni. La dispensa consente di aggiungere ingredienti manualmente, visualizzare quelli esistenti e rimuoverli. Nella sezione Ricette, l'utente può esplorare le ricette suggerite in base agli ingredienti disponibili nella dispensa. Ogni ricetta mostra il titolo, gli ingredienti necessari e quelli mancanti. Gli ingredienti delle ricette possono essere aggiunti al carrello per creare una lista della spesa. La sezione Impostazioni permette di modificare le informazioni dell'account o cancellarlo.
+Una volta autenticato, l'utente verrà indirizzato alla schermata principale dell'app, che include una barra di navigazione inferiore per accedere alle diverse sezioni: Dispensa, Ricette, Carrello e Impostazioni. La dispensa consente di aggiungere ingredienti manualmente, visualizzare quelli esistenti e rimuoverli. Gli ingredienti delle ricette possono essere aggiunti e visualizzati nel carrello per creare una lista della spesa. La sezione Impostazioni permette di modificare le informazioni dell'account o cancellarlo.
 
 <p align="center">
   <img src="img/readme/pantry.png" alt="Schermata Dispensa" width="300"/>
   <img src="img/readme/cart.png" alt="Schermata Carrello" width="300"/>
   <img src="img/readme/settings.png" alt="Schermata Impostazioni" width="300"/>
 </p>
+
+### Spoonacular API
+L'API [Spoonacular API](https://spoonacular.com/food-api) consente di accedere a migliaia di ricette, migliaia di ingredienti, 800.000 prodotti alimentari e 100.000 voci di menu. Per questo progetto, l'API viene utilizzata per cercare ricette in base agli ingredienti disponibili nella dispensa dell'utente. Quando l'utente accede alla sezione Ricette, l'app invia una richiesta all'API con gli ingredienti presenti nella dispensa. L'API restituisce un elenco di ricette che possono essere preparate con quegli ingredienti, insieme a informazioni come il titolo della ricetta, gli ingredienti necessari e quelli mancanti.
 
 <p align="center">
   <img src="img/readme/recipes.png" alt="Schermata Ricette" width="400"/>
@@ -39,9 +42,6 @@ Una volta autenticato, l'utente verrà indirizzato alla schermata principale del
 - **flutter** SDK 3.8.1
 - **hive** database locale chiave-valore
 - **http**: per richieste API
-
-### Spoonacular API
-L'API [Spoonacular API](https://spoonacular.com/food-api) consente di accedere a migliaia di ricette, migliaia di ingredienti, 800.000 prodotti alimentari e 100.000 voci di menu.
 
 ### Struttura del progetto
 ```
