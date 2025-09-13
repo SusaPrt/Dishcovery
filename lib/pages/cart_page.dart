@@ -89,7 +89,6 @@ class _CartPageState extends State<CartPage> {
                   ownerEmail: currentUserEmail,
                 ));
                 Navigator.pop(context);
-                setState(() {});
               }
             },
             child: Text('Add'),
@@ -101,7 +100,6 @@ class _CartPageState extends State<CartPage> {
 
   void _removeCartItem(int index) {
     cartBox?.deleteAt(index);
-    setState(() {});
   }
 
   @override
@@ -124,7 +122,6 @@ class _CartPageState extends State<CartPage> {
             : ValueListenableBuilder(
                 valueListenable: cartBox!.listenable(),
                 builder: (context, Box<Ingredient> box, _) {
-                  // Filter cart items for current user
                   final userCartItems = box.values
                       .where((i) => i.ownerEmail == currentUserEmail)
                       .toList();
@@ -135,7 +132,6 @@ class _CartPageState extends State<CartPage> {
                     itemCount: userCartItems.length,
                     itemBuilder: (context, index) {
                       final item = userCartItems[index];
-                      // Find the actual index in the box for delete
                       final boxIndex = box.values.toList().indexOf(item);
                       return Center(
                         child: SizedBox(

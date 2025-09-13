@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/ingredient.dart';
-import 'package:hive/hive.dart';
-
 
 class PantryPage extends StatefulWidget {
   const PantryPage({super.key});
@@ -95,7 +93,6 @@ class _PantryPageState extends State<PantryPage> {
                   ownerEmail: currentUserEmail,
                 ));
                 Navigator.pop(context);
-                setState(() {});
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Please enter valid name and quantity')),
@@ -171,7 +168,6 @@ class _PantryPageState extends State<PantryPage> {
 
   void _removeIngredient(int index) {
     ingredientBox?.deleteAt(index);
-    setState(() {});
   }
 
   @override
@@ -194,7 +190,6 @@ class _PantryPageState extends State<PantryPage> {
             : ValueListenableBuilder(
                 valueListenable: ingredientBox!.listenable(),
                 builder: (context, Box<Ingredient> box, _) {
-                  // Filter ingredients for current user
                   final userIngredients = box.values
                       .where((i) => i.ownerEmail == currentUserEmail)
                       .toList();
@@ -205,7 +200,6 @@ class _PantryPageState extends State<PantryPage> {
                     itemCount: userIngredients.length,
                     itemBuilder: (context, index) {
                       final ingredient = userIngredients[index];
-                      // Find the actual index in the box for edit/delete
                       final boxIndex = box.values.toList().indexOf(ingredient);
                       return Center(
                         child: SizedBox(
